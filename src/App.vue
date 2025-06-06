@@ -89,9 +89,9 @@ const resetForm = () => {
 
   // 重置水印选项为默认值
   Object.assign(watermarkOptions, {
-    text: '机密文件',
-    color: '#808080', // 使用十六进制格式
-    opacity: 1,
+    text: '严禁复制',
+    color: '#000000', // 使用十六进制格式
+    opacity: 0.9,
     fontSize: 50,
     rotation: 45,
     density: 2
