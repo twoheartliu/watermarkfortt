@@ -73,4 +73,4 @@ npm run build
 
 ## 📄 许可证
 
-MIT
+[MIT](./LICENSE)
