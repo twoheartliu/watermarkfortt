@@ -27,12 +27,12 @@ const ensureNumberValues = () => {
 
 // 修改初始颜色为十六进制格式
 const watermarkOptions = reactive({
-  text: '机密文件',
+  text: '严禁复制',
   color: '#000000', // 使用十六进制格式
-  opacity: 1,
+  opacity: 0.9,
   fontSize: 50,
   rotation: 45,
-  density: 3
+  density: 2
 })
 
 // 处理文件选择
@@ -94,7 +94,7 @@ const resetForm = () => {
     opacity: 1,
     fontSize: 50,
     rotation: 45,
-    density: 3
+    density: 2
   })
 }
 </script>
