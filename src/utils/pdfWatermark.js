@@ -43,7 +43,7 @@ export async function addWatermarkToPDF(file, watermarkOptions) {
     let useChineseFont = true
     try {
       // 加载本地黑体字体
-      const fontPath = '/src/assets/fonts/simhei.ttf'
+      const fontPath = '/fonts/simhei.ttf'
       console.log('尝试加载本地黑体字体:', fontPath)
       const fontResponse = await fetch(fontPath)
 
