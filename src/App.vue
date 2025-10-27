@@ -29,8 +29,8 @@ const ensureNumberValues = () => {
 const watermarkOptions = reactive({
   text: '严禁复制',
   color: '#000000', // 使用十六进制格式
-  opacity: 0.9,
-  fontSize: 50,
+  opacity: 0.7,
+  fontSize: 45,
   rotation: 45,
   density: 2
 })
