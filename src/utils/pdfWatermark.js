@@ -122,7 +122,7 @@ export async function addWatermarkToPDF(file, watermarkOptions) {
 
     // 创建Blob并下载
     const blob = new Blob([modifiedPdfBytes], { type: "application/pdf" });
-    saveAs(blob, `watermarked_${file.name}`);
+    saveAs(blob, `水印版_${file.name}`);
 
     console.log("文档已保存并下载");
     return true;

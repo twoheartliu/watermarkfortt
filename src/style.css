@@ -1,79 +1,112 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:is(.dark *));
+
+/* ============================================
+   Claude / Anthropic Design Palette
+   Warm cream canvas + coral accent
+   ============================================ */
+
 :root {
-  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
-  line-height: 1.5;
-  font-weight: 400;
+  /* Surface */
+  --background: #faf9f5;
+  --foreground: #1a1a1a;
+  --card: #ffffff;
+  --card-foreground: #1a1a1a;
+  --popover: #ffffff;
+  --popover-foreground: #1a1a1a;
 
-  color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
+  /* Brand - Coral */
+  --primary: #cc785c;
+  --primary-foreground: #ffffff;
 
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
+  /* Secondary - Warm light */
+  --secondary: #f0ede6;
+  --secondary-foreground: #1a1a1a;
+
+  /* Muted */
+  --muted: #f0ede6;
+  --muted-foreground: #6b6560;
+
+  /* Accent */
+  --accent: #f0ede6;
+  --accent-foreground: #1a1a1a;
+
+  /* Destructive */
+  --destructive: #a8483a;
+  --destructive-foreground: #ffffff;
+
+  /* Borders & Inputs */
+  --border: #e5ddd5;
+  --input: #e5ddd5;
+  --ring: #cc785c;
+
+  /* Border radius */
+  --radius: 0.5rem;
+}
+
+.dark {
+  --background: #1a1816;
+  --foreground: #faf9f5;
+  --card: #252320;
+  --card-foreground: #faf9f5;
+  --popover: #252320;
+  --popover-foreground: #faf9f5;
+  --primary: #d4896e;
+  --primary-foreground: #1a1816;
+  --secondary: #3a3530;
+  --secondary-foreground: #faf9f5;
+  --muted: #3a3530;
+  --muted-foreground: #a09890;
+  --accent: #3a3530;
+  --accent-foreground: #faf9f5;
+  --destructive: #c05a4a;
+  --destructive-foreground: #faf9f5;
+  --border: #3a3530;
+  --input: #3a3530;
+  --ring: #d4896e;
+}
+
+/* Tailwind v4 theme integration */
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --radius-sm: calc(var(--radius) - 0.25rem);
+  --radius-md: var(--radius);
+  --radius-lg: calc(var(--radius) + 0.25rem);
+  --radius-xl: calc(var(--radius) + 0.5rem);
+}
+
+/* Base body styling — Claude editorial aesthetic */
+body {
+  background-color: var(--background);
+  color: var(--foreground);
+  font-family: Georgia, 'Times New Roman', 'Noto Serif SC', 'Source Han Serif SC', 'Songti SC', serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-a {
-  font-weight: 500;
-  color: #646cff;
-  text-decoration: inherit;
-}
-a:hover {
-  color: #535bf2;
-}
-
-body {
-  margin: 0;
-  display: flex;
-  place-items: center;
-  min-width: 320px;
-  min-height: 100vh;
-}
-
-h1 {
-  font-size: 3.2em;
-  line-height: 1.1;
-}
-
-button {
-  border-radius: 8px;
-  border: 1px solid transparent;
-  padding: 0.6em 1.2em;
-  font-size: 1em;
-  font-weight: 500;
-  font-family: inherit;
-  background-color: #1a1a1a;
-  cursor: pointer;
-  transition: border-color 0.25s;
-}
-button:hover {
-  border-color: #646cff;
-}
-button:focus,
-button:focus-visible {
-  outline: 4px auto -webkit-focus-ring-color;
-}
-
-.card {
-  padding: 2em;
-}
-
-#app {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
-  text-align: center;
-}
-
-@media (prefers-color-scheme: light) {
-  :root {
-    color: #213547;
-    background-color: #ffffff;
-  }
-  a:hover {
-    color: #747bff;
-  }
-  button {
-    background-color: #f9f9f9;
-  }
+/* Sans-serif for UI controls */
+button,
+input,
+select,
+.sans {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'PingFang SC', 'Microsoft YaHei', sans-serif;
 }
