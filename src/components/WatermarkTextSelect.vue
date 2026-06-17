@@ -1,6 +1,6 @@
 <script setup>
 import { ref, computed, watch, onUnmounted } from 'vue'
-import { ChevronDown, Check, Plus } from 'lucide-vue-next'
+import { ChevronDown, Check, Plus, X } from 'lucide-vue-next'
 import Input from '@/components/ui/Input.vue'
 import Button from '@/components/ui/Button.vue'
 import Separator from '@/components/ui/Separator.vue'
@@ -61,6 +61,14 @@ const allPresets = computed(() => {
 const isCurrentTextPreset = computed(() => {
   return allPresets.value.includes(props.modelValue.trim())
 })
+
+// ---- check if input has text ----
+const hasText = computed(() => localText.value.length > 0)
+
+// ---- clear text ----
+const clearText = () => {
+  localText.value = ''
+}
 
 // ---- sync external modelValue → localText ----
 watch(
@@ -166,8 +174,17 @@ onUnmounted(() => {
           type="text"
           :disabled="disabled"
           placeholder="输入水印文字，比如「踢踢YYDS」"
-          class="rounded-r-none border-r-0 focus-visible:z-10"
+          :class="['rounded-r-none border-r-0 focus-visible:z-10', hasText && 'pr-8']"
         />
+        <button
+          v-if="hasText && !disabled"
+          type="button"
+          class="absolute right-1.5 top-1/2 -translate-y-1/2 rounded-sm p-0.5 text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"
+          aria-label="清空输入"
+          @click="clearText"
+        >
+          <X class="h-4 w-4" />
+        </button>
       </div>
       <Button
         ref="triggerRef"
