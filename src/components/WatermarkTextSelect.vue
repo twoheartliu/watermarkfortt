@@ -179,7 +179,7 @@ onUnmounted(() => {
         <button
           v-if="hasText && !disabled"
           type="button"
-          class="absolute right-1.5 top-1/2 -translate-y-1/2 rounded-sm p-0.5 text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"
+          class="absolute right-1.5 top-1/2 -translate-y-1/2 rounded-sm p-0.5 text-muted-foreground hover:text-foreground hover:bg-accent transition-colors cursor-pointer"
           aria-label="清空输入"
           @click="clearText"
         >
@@ -244,7 +244,7 @@ onUnmounted(() => {
             <!-- Delete button for custom presets -->
             <button
               v-if="customPresets.includes(preset)"
-              class="ml-1 shrink-0 rounded p-0.5 text-muted-foreground hover:text-destructive hover:bg-destructive/10"
+              class="ml-1 shrink-0 rounded p-0.5 text-muted-foreground hover:text-destructive hover:bg-destructive/10 cursor-pointer"
               @mousedown.stop
               @click.stop="deleteCustomPreset(preset)"
               title="删除此预设"
@@ -262,7 +262,7 @@ onUnmounted(() => {
           <Separator />
           <div class="p-1">
             <button
-              class="flex w-full items-center gap-2 rounded-sm px-2 py-1.5 text-sm text-muted-foreground hover:bg-accent hover:text-accent-foreground outline-none"
+              class="flex w-full items-center gap-2 rounded-sm px-2 py-1.5 text-sm text-muted-foreground hover:bg-accent hover:text-accent-foreground outline-none cursor-pointer"
               @mousedown.prevent="addAsPreset"
             >
               <Plus class="h-4 w-4 shrink-0" />

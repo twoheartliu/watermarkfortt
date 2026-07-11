@@ -193,7 +193,7 @@ const resetForm = () => {
             <div class="mb-4 flex rounded-lg bg-muted p-1">
               <button
                 :class="[
-                  'flex-1 rounded-md px-3 py-1.5 text-sm font-medium transition-colors',
+                  'flex-1 rounded-md px-3 py-1.5 text-sm font-medium transition-colors cursor-pointer',
                   activeTab === 'file'
                     ? 'bg-background text-foreground shadow-sm'
                     : 'text-muted-foreground hover:text-foreground',
@@ -204,7 +204,7 @@ const resetForm = () => {
               </button>
               <button
                 :class="[
-                  'flex-1 rounded-md px-3 py-1.5 text-sm font-medium transition-colors',
+                  'flex-1 rounded-md px-3 py-1.5 text-sm font-medium transition-colors cursor-pointer',
                   activeTab === 'image'
                     ? 'bg-background text-foreground shadow-sm'
                     : 'text-muted-foreground hover:text-foreground',
