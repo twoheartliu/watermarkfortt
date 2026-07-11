@@ -1,7 +1,6 @@
 <script setup>
 import { ref, reactive, watch, onMounted } from 'vue'
 import { addWatermarkToPDF } from './utils/pdfWatermark'
-import { addWatermarkToDocx } from './utils/docxWatermark'
 import Button from '@/components/ui/Button.vue'
 import Card from '@/components/ui/Card.vue'
 import CardHeader from '@/components/ui/CardHeader.vue'
@@ -106,7 +105,21 @@ const handleAddWatermark = async () => {
     }
 
     if (isDocx) {
-      await addWatermarkToDocx(selectedFile.value, processedOptions)
+      // 上传到后端转换为 PDF
+      const formData = new FormData()
+      formData.append('file', selectedFile.value)
+      const res = await fetch('/api/convert', { method: 'POST', body: formData })
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({ message: '文档转换失败' }))
+        throw new Error(err.message || '文档转换失败')
+      }
+
+      // 拿转换后的 PDF 加水印
+      const pdfBlob = await res.blob()
+      const pdfFile = new File([pdfBlob], selectedFile.value.name.replace(/\.docx$/i, '.pdf'), {
+        type: 'application/pdf',
+      })
+      await addWatermarkToPDF(pdfFile, processedOptions)
     } else {
       await addWatermarkToPDF(selectedFile.value, processedOptions)
     }
