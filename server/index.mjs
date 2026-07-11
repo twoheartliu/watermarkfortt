@@ -47,8 +47,6 @@ app.post('/api/convert', upload.single('file'), async (req, res) => {
         ['--headless', '--convert-to', 'pdf', inputPath],
         { timeout: 120_000, cwd: workDir },
         (err, stdout, stderr) => {
-          console.log('libreoffice stdout:', stdout);
-          if (stderr) console.log('libreoffice stderr:', stderr);
           if (err) {
             reject(new Error(stderr || stdout || err.message));
           } else {
