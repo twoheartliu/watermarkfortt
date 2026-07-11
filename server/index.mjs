@@ -56,7 +56,7 @@ app.post('/api/convert', upload.single('file'), async (req, res) => {
     });
 
     // find the generated PDF
-    const inputBase = basename(req.file.originalname, /\.[^.]+$/);
+    const inputBase = basename(req.file.originalname).replace(/\.[^.]+$/, '');
     pdfPath = join(workDir, `${inputBase}.pdf`);
 
     const pdfBuffer = await readFile(pdfPath);
