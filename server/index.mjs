@@ -18,13 +18,13 @@ app.use(cors());
 
 // ---- health check -----------------------------------------------------------
 
-app.get('/api/health', (_req, res) => {
+app.get(['/api/health', '/health'], (_req, res) => {
   res.json({ status: 'ok' });
 });
 
 // ---- DOCX → PDF conversion -------------------------------------------------
 
-app.post('/api/convert', upload.single('file'), async (req, res) => {
+app.post(['/api/convert', '/convert'], upload.single('file'), async (req, res) => {
   if (!req.file) {
     return res.status(400).json({ message: '未上传文件哦～' });
   }
