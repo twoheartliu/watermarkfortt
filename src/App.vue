@@ -14,7 +14,7 @@ import Separator from '@/components/ui/Separator.vue'
 import WatermarkTextSelect from '@/components/WatermarkTextSelect.vue'
 
 const STORAGE_KEY = 'watermark-options'
-const watermarkTextPresets = ['踢踢专用', '写稿大王踢踢', '严禁复制']
+const watermarkTextPresets = ['踢踢专用', '写稿大王踢踢', '严禁复制', '心心写稿']
 
 const fileInput = ref(null)
 const selectedFile = ref(null)
@@ -145,7 +145,7 @@ const handleAddWatermark = async () => {
       }
     }
 
-    successMessage.value = '水印已添加，文档已保护！✨'
+    successMessage.value = '水印已添加！✨'
   } catch (error) {
     console.error('处理文件时出错:', error)
     errorMessage.value = `处理失败: ${error.message}`
@@ -177,7 +177,7 @@ const resetForm = () => {
           踢踢的水印小工具 🪄
         </h1>
         <p class="mt-3 text-base text-muted-foreground">
-          写稿大王踢踢专用的文档守护神器
+          写稿大王踢踢专属，文档、图片都能保护
         </p>
       </header>
 
@@ -217,7 +217,7 @@ const resetForm = () => {
 
             <!-- File mode -->
             <div v-if="activeTab === 'file'" class="space-y-2">
-              <Label id="upload-label">选择文件</Label>
+              <Label id="upload-label">选择文件（支持 PDF、DOCX）</Label>
               <Input
                 ref="fileInput"
                 type="file"
@@ -236,14 +236,14 @@ const resetForm = () => {
 
             <!-- Image mode -->
             <div v-if="activeTab === 'image'" class="space-y-2">
-              <Label id="upload-label">选择图片（可多选）</Label>
+              <Label id="image-upload-label">选择图片（支持 JPG、PNG、WebP，可多选）</Label>
               <Input
                 ref="fileInput"
                 type="file"
                 accept="image/*"
                 multiple
                 :disabled="isProcessing"
-                aria-labelledby="upload-label"
+                aria-labelledby="image-upload-label"
                 @change="handleImageChange"
               />
               <div
@@ -376,7 +376,7 @@ const resetForm = () => {
             :disabled="(activeTab === 'file' ? !selectedFile : imageFiles.length === 0) || isProcessing"
             @click="handleAddWatermark"
           >
-            {{ isProcessing ? '处理中...' : '✨ 添加水印' }}
+            {{ isProcessing ? '正在处理中...' : '✨ 一键添加水印' }}
           </Button>
           <Button
             variant="outline"
