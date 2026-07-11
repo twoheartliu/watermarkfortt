@@ -30,13 +30,14 @@ app.post('/api/convert', upload.single('file'), async (req, res) => {
   }
 
   const workDir = join(tmpdir(), randomUUID());
-  const inputPath = join(workDir, req.file.originalname);
-  let pdfPath;
+  const ext = req.file.originalname.match(/\.([^.]+)$/)?.[1] || 'docx';
+  const inputPath = join(workDir, `input.${ext}`);
+  const pdfPath = join(workDir, 'input.pdf');
 
   try {
     await mkdir(workDir);
 
-    // move multer file to work dir with original name (so LibreOffice uses correct extension)
+    // copy to work dir with ASCII name to avoid LibreOffice encoding issues
     await (await import('node:fs/promises')).copyFile(req.file.path, inputPath);
 
     // headless conversion
@@ -55,13 +56,10 @@ app.post('/api/convert', upload.single('file'), async (req, res) => {
       );
     });
 
-    // find the generated PDF
-    const inputBase = basename(req.file.originalname).replace(/\.[^.]+$/, '');
-    pdfPath = join(workDir, `${inputBase}.pdf`);
-
     const pdfBuffer = await readFile(pdfPath);
+    const outputName = basename(req.file.originalname).replace(/\.[^.]+$/, '.pdf');
     res.setHeader('Content-Type', 'application/pdf');
-    res.setHeader('Content-Disposition', `attachment; filename="${inputBase}.pdf"`);
+    res.setHeader('Content-Disposition', `attachment; filename*=UTF-8''${encodeURIComponent(outputName)}`);
     res.send(pdfBuffer);
   } catch (err) {
     console.error('转换失败:', err);
