@@ -100,9 +100,9 @@ const handleAddWatermark = async () => {
     const processedOptions = {
       ...watermarkOptions,
       opacity: parseFloat(watermarkOptions.opacity),
-      fontSize: parseInt(watermarkOptions.fontSize),
-      rotation: parseInt(watermarkOptions.rotation),
-      density: parseInt(watermarkOptions.density),
+      fontSize: parseInt(watermarkOptions.fontSize, 10),
+      rotation: parseInt(watermarkOptions.rotation, 10),
+      density: parseInt(watermarkOptions.density, 10),
     }
 
     if (isDocx) {

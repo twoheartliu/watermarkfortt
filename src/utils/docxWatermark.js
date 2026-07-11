@@ -15,6 +15,7 @@ async function ensureFontLoaded() {
     fontReady = true;
   } catch {
     // proceed with system fonts — Chinese may render as tofu on non-CJK systems
+    fontReady = true;
   }
 }
 
@@ -159,18 +160,13 @@ export async function addWatermarkToDocx(file, watermarkOptions) {
     throw new Error('文件过大，请选择小于 50MB 的 DOCX 文件哦～');
   }
 
-  const parsedOpacity = parseFloat(watermarkOptions.opacity);
-  const parsedFontSize = parseInt(watermarkOptions.fontSize, 10);
-  const parsedRotation = parseInt(watermarkOptions.rotation, 10);
-  const parsedDensity = parseInt(watermarkOptions.density, 10);
-
   const options = {
     text: watermarkOptions.text || '水印文本',
     color: watermarkOptions.color || '#000000',
-    opacity: isNaN(parsedOpacity) ? 0.5 : parsedOpacity,
-    fontSize: isNaN(parsedFontSize) ? 45 : parsedFontSize,
-    rotation: isNaN(parsedRotation) ? 45 : parsedRotation,
-    density: isNaN(parsedDensity) ? 2 : parsedDensity,
+    opacity: isNaN(watermarkOptions.opacity) ? 0.5 : watermarkOptions.opacity,
+    fontSize: isNaN(watermarkOptions.fontSize) ? 45 : watermarkOptions.fontSize,
+    rotation: isNaN(watermarkOptions.rotation) ? 45 : watermarkOptions.rotation,
+    density: isNaN(watermarkOptions.density) ? 2 : watermarkOptions.density,
   };
 
   // --- load font (best effort) ----------------------------------------------
