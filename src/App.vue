@@ -1,6 +1,7 @@
 <script setup>
 import { ref, reactive, watch, onMounted } from 'vue'
 import { addWatermarkToPDF } from './utils/pdfWatermark'
+import { addWatermarkToDocx } from './utils/docxWatermark'
 import Button from '@/components/ui/Button.vue'
 import Card from '@/components/ui/Card.vue'
 import CardHeader from '@/components/ui/CardHeader.vue'
@@ -61,20 +62,32 @@ watch(
   { deep: true }
 )
 
+const isValidFile = (file) => {
+  if (!file) return false
+  // PDF
+  if (file.type === 'application/pdf' || file.name.endsWith('.pdf')) return true
+  // DOCX — some browsers return empty MIME, so check extension as well
+  if (
+    file.type === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' ||
+    file.name.endsWith('.docx')
+  ) return true
+  return false
+}
+
 const handleFileChange = (event) => {
   const file = event.target.files[0]
-  if (file && file.type === 'application/pdf') {
+  if (file && isValidFile(file)) {
     selectedFile.value = file
     errorMessage.value = ''
   } else {
     selectedFile.value = null
-    errorMessage.value = '请选择有效的 PDF 文件哦～'
+    errorMessage.value = '请选择有效的 PDF 或 DOCX 文件哦～'
   }
 }
 
 const handleAddWatermark = async () => {
   if (!selectedFile.value) {
-    errorMessage.value = '请先选择一个 PDF 文件哦～'
+    errorMessage.value = '请先选择一个文件哦～'
     return
   }
 
@@ -83,17 +96,24 @@ const handleAddWatermark = async () => {
     errorMessage.value = ''
     successMessage.value = ''
 
-    await addWatermarkToPDF(selectedFile.value, {
+    const isDocx = selectedFile.value.name.endsWith('.docx')
+    const processedOptions = {
       ...watermarkOptions,
       opacity: parseFloat(watermarkOptions.opacity),
       fontSize: parseInt(watermarkOptions.fontSize),
       rotation: parseInt(watermarkOptions.rotation),
       density: parseInt(watermarkOptions.density),
-    })
+    }
+
+    if (isDocx) {
+      await addWatermarkToDocx(selectedFile.value, processedOptions)
+    } else {
+      await addWatermarkToPDF(selectedFile.value, processedOptions)
+    }
 
     successMessage.value = '水印已添加，文档已保护！✨'
   } catch (error) {
-    console.error('处理PDF时出错:', error)
+    console.error('处理文件时出错:', error)
     errorMessage.value = `处理失败: ${error.message}`
   } finally {
     isProcessing.value = false
@@ -131,7 +151,7 @@ const resetForm = () => {
         <!-- File Upload -->
         <Card>
           <CardHeader>
-            <CardTitle>📄 选择 PDF 文件</CardTitle>
+            <CardTitle>📄 选择文件</CardTitle>
           </CardHeader>
           <CardContent>
             <div class="space-y-2">
@@ -139,7 +159,7 @@ const resetForm = () => {
               <Input
                 ref="fileInput"
                 type="file"
-                accept=".pdf"
+                accept=".pdf,.docx"
                 :disabled="isProcessing"
                 aria-labelledby="pdf-upload-label"
                 @change="handleFileChange"
