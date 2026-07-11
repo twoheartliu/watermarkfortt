@@ -1,6 +1,7 @@
 <script setup>
 import { ref, reactive, watch, onMounted } from 'vue'
 import { addWatermarkToPDF } from './utils/pdfWatermark'
+import { addWatermarkToImages } from './utils/imageWatermark'
 import Button from '@/components/ui/Button.vue'
 import Card from '@/components/ui/Card.vue'
 import CardHeader from '@/components/ui/CardHeader.vue'
@@ -17,6 +18,8 @@ const watermarkTextPresets = ['踢踢专用', '写稿大王踢踢', '严禁复�
 
 const fileInput = ref(null)
 const selectedFile = ref(null)
+const imageFiles = ref([])
+const activeTab = ref('file') // 'file' | 'image'
 const isProcessing = ref(false)
 const errorMessage = ref('')
 const successMessage = ref('')
@@ -84,10 +87,27 @@ const handleFileChange = (event) => {
   }
 }
 
+const handleImageChange = (event) => {
+  const files = Array.from(event.target.files || [])
+  imageFiles.value = files.filter(f => f.type.startsWith('image/'))
+  errorMessage.value = ''
+  if (imageFiles.value.length === 0 && files.length > 0) {
+    errorMessage.value = '请选择有效的图片文件哦～'
+  }
+}
+
 const handleAddWatermark = async () => {
-  if (!selectedFile.value) {
-    errorMessage.value = '请先选择一个文件哦～'
-    return
+  // validate
+  if (activeTab.value === 'image') {
+    if (imageFiles.value.length === 0) {
+      errorMessage.value = '请先选择图片哦～'
+      return
+    }
+  } else {
+    if (!selectedFile.value) {
+      errorMessage.value = '请先选择一个文件哦～'
+      return
+    }
   }
 
   try {
@@ -95,7 +115,6 @@ const handleAddWatermark = async () => {
     errorMessage.value = ''
     successMessage.value = ''
 
-    const isDocx = selectedFile.value.name.endsWith('.docx')
     const processedOptions = {
       ...watermarkOptions,
       opacity: parseFloat(watermarkOptions.opacity),
@@ -104,24 +123,26 @@ const handleAddWatermark = async () => {
       density: parseInt(watermarkOptions.density, 10),
     }
 
-    if (isDocx) {
-      // 上传到后端转换为 PDF
-      const formData = new FormData()
-      formData.append('file', selectedFile.value)
-      const res = await fetch('/api/convert', { method: 'POST', body: formData })
-      if (!res.ok) {
-        const err = await res.json().catch(() => ({ message: '文档转换失败' }))
-        throw new Error(err.message || '文档转换失败')
-      }
-
-      // 拿转换后的 PDF 加水印
-      const pdfBlob = await res.blob()
-      const pdfFile = new File([pdfBlob], selectedFile.value.name.replace(/\.docx$/i, '.pdf'), {
-        type: 'application/pdf',
-      })
-      await addWatermarkToPDF(pdfFile, processedOptions)
+    if (activeTab.value === 'image') {
+      await addWatermarkToImages(imageFiles.value, processedOptions)
     } else {
-      await addWatermarkToPDF(selectedFile.value, processedOptions)
+      const isDocx = selectedFile.value.name.endsWith('.docx')
+      if (isDocx) {
+        const formData = new FormData()
+        formData.append('file', selectedFile.value)
+        const res = await fetch('/api/convert', { method: 'POST', body: formData })
+        if (!res.ok) {
+          const err = await res.json().catch(() => ({ message: '文档转换失败' }))
+          throw new Error(err.message || '文档转换失败')
+        }
+        const pdfBlob = await res.blob()
+        const pdfFile = new File([pdfBlob], selectedFile.value.name.replace(/\.docx$/i, '.pdf'), {
+          type: 'application/pdf',
+        })
+        await addWatermarkToPDF(pdfFile, processedOptions)
+      } else {
+        await addWatermarkToPDF(selectedFile.value, processedOptions)
+      }
     }
 
     successMessage.value = '水印已添加，文档已保护！✨'
@@ -138,6 +159,7 @@ const resetForm = () => {
     fileInput.value.value = ''
   }
   selectedFile.value = null
+  imageFiles.value = []
   errorMessage.value = ''
   successMessage.value = ''
 
@@ -167,22 +189,76 @@ const resetForm = () => {
             <CardTitle>📄 选择文件</CardTitle>
           </CardHeader>
           <CardContent>
-            <div class="space-y-2">
-              <Label id="pdf-upload-label">选择文件</Label>
+            <!-- Tab switcher -->
+            <div class="mb-4 flex rounded-lg bg-muted p-1">
+              <button
+                :class="[
+                  'flex-1 rounded-md px-3 py-1.5 text-sm font-medium transition-colors',
+                  activeTab === 'file'
+                    ? 'bg-background text-foreground shadow-sm'
+                    : 'text-muted-foreground hover:text-foreground',
+                ]"
+                @click="activeTab = 'file'"
+              >
+                📄 文件水印
+              </button>
+              <button
+                :class="[
+                  'flex-1 rounded-md px-3 py-1.5 text-sm font-medium transition-colors',
+                  activeTab === 'image'
+                    ? 'bg-background text-foreground shadow-sm'
+                    : 'text-muted-foreground hover:text-foreground',
+                ]"
+                @click="activeTab = 'image'"
+              >
+                🖼️ 图片水印
+              </button>
+            </div>
+
+            <!-- File mode -->
+            <div v-if="activeTab === 'file'" class="space-y-2">
+              <Label id="upload-label">选择文件</Label>
               <Input
                 ref="fileInput"
                 type="file"
                 accept=".pdf,.docx"
                 :disabled="isProcessing"
-                aria-labelledby="pdf-upload-label"
+                aria-labelledby="upload-label"
                 @change="handleFileChange"
               />
+              <div
+                v-if="selectedFile"
+                class="mt-3 rounded-md bg-muted/50 px-3 py-2 text-sm text-muted-foreground"
+              >
+                已选择: {{ selectedFile.name }} ({{ (selectedFile.size / 1024).toFixed(2) }} KB)
+              </div>
             </div>
-            <div
-              v-if="selectedFile"
-              class="mt-3 rounded-md bg-muted/50 px-3 py-2 text-sm text-muted-foreground"
-            >
-              已选择: {{ selectedFile.name }} ({{ (selectedFile.size / 1024).toFixed(2) }} KB)
+
+            <!-- Image mode -->
+            <div v-if="activeTab === 'image'" class="space-y-2">
+              <Label id="upload-label">选择图片（可多选）</Label>
+              <Input
+                ref="fileInput"
+                type="file"
+                accept="image/*"
+                multiple
+                :disabled="isProcessing"
+                aria-labelledby="upload-label"
+                @change="handleImageChange"
+              />
+              <div
+                v-if="imageFiles.length > 0"
+                class="mt-2 space-y-1"
+              >
+                <p class="text-sm text-muted-foreground">
+                  已选择 {{ imageFiles.length }} 张图片{{ imageFiles.length > 1 ? '，将打包为 ZIP' : '' }}
+                </p>
+                <ul class="max-h-32 space-y-0.5 overflow-y-auto text-sm text-muted-foreground">
+                  <li v-for="(f, i) in imageFiles" :key="i">
+                    🖼️ {{ f.name }} ({{ (f.size / 1024).toFixed(2) }} KB)
+                  </li>
+                </ul>
+              </div>
             </div>
           </CardContent>
         </Card>
@@ -297,7 +373,7 @@ const resetForm = () => {
         <!-- Actions -->
         <div class="flex gap-3">
           <Button
-            :disabled="!selectedFile || isProcessing"
+            :disabled="(activeTab === 'file' ? !selectedFile : imageFiles.length === 0) || isProcessing"
             @click="handleAddWatermark"
           >
             {{ isProcessing ? '处理中...' : '✨ 添加水印' }}
