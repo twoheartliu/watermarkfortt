@@ -8,7 +8,7 @@ let fontReady = false;
 async function ensureFontLoaded() {
   if (fontReady) return;
   try {
-    if (typeof FontFace === 'undefined') return;
+    if (typeof FontFace === 'undefined') { fontReady = true; return; }
     const font = new FontFace('SimHei', 'url(/fonts/simhei.ttf)');
     await font.load();
     document.fonts.add(font);
@@ -78,6 +78,7 @@ function renderWatermarkImage(options) {
   canvas.width = W;
   canvas.height = H;
   const ctx = canvas.getContext('2d');
+  if (!ctx) throw new Error('Canvas 2D 渲染上下文不可用');
 
   // transparent background — the DOCX page background shows through
   ctx.globalAlpha = options.opacity;
@@ -140,7 +141,7 @@ function injectBackground(documentXml, rId) {
   // Replace if already exists; otherwise insert before <w:body
   if (/<w:background[\s>]/.test(documentXml)) {
     return documentXml.replace(
-      /<w:background[\s>][\s\S]*?<\/w:background>/,
+      /<w:background[\s>][\s\S]*?(?:<\/w:background>|\/>)/,
       BACKGROUND_VML(rId),
     );
   }
@@ -158,13 +159,18 @@ export async function addWatermarkToDocx(file, watermarkOptions) {
     throw new Error('文件过大，请选择小于 50MB 的 DOCX 文件哦～');
   }
 
+  const parsedOpacity = parseFloat(watermarkOptions.opacity);
+  const parsedFontSize = parseInt(watermarkOptions.fontSize, 10);
+  const parsedRotation = parseInt(watermarkOptions.rotation, 10);
+  const parsedDensity = parseInt(watermarkOptions.density, 10);
+
   const options = {
     text: watermarkOptions.text || '水印文本',
     color: watermarkOptions.color || '#000000',
-    opacity: parseFloat(watermarkOptions.opacity) || 0.5,
-    fontSize: parseInt(watermarkOptions.fontSize) || 45,
-    rotation: parseInt(watermarkOptions.rotation) || 45,
-    density: parseInt(watermarkOptions.density) || 2,
+    opacity: isNaN(parsedOpacity) ? 0.5 : parsedOpacity,
+    fontSize: isNaN(parsedFontSize) ? 45 : parsedFontSize,
+    rotation: isNaN(parsedRotation) ? 45 : parsedRotation,
+    density: isNaN(parsedDensity) ? 2 : parsedDensity,
   };
 
   // --- load font (best effort) ----------------------------------------------
@@ -237,5 +243,5 @@ export async function addWatermarkToDocx(file, watermarkOptions) {
     compression: 'DEFLATE',
     compressionOptions: { level: 6 },
   });
-  saveAs(outputBlob, `水印版_${file.name}`);
+  saveAs(outputBlob, `水印版_${file.name || 'document.docx'}`);
 }
