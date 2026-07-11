@@ -1,5 +1,5 @@
 import { execFile } from 'node:child_process';
-import { rm, mkdir, readFile } from 'node:fs/promises';
+import { rm, mkdir, readFile, copyFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join, basename } from 'node:path';
 import { randomUUID } from 'node:crypto';
@@ -38,15 +38,17 @@ app.post('/api/convert', upload.single('file'), async (req, res) => {
     await mkdir(workDir);
 
     // copy to work dir with ASCII name to avoid LibreOffice encoding issues
-    await (await import('node:fs/promises')).copyFile(req.file.path, inputPath);
+    await copyFile(req.file.path, inputPath);
 
-    // headless conversion
+    // headless conversion — use cwd so PDF lands in workDir
     await new Promise((resolve, reject) => {
       execFile(
         'libreoffice',
-        ['--headless', '--convert-to', 'pdf', '--outdir', workDir, inputPath],
-        { timeout: 120_000 },
+        ['--headless', '--convert-to', 'pdf', inputPath],
+        { timeout: 120_000, cwd: workDir },
         (err, stdout, stderr) => {
+          console.log('libreoffice stdout:', stdout);
+          if (stderr) console.log('libreoffice stderr:', stderr);
           if (err) {
             reject(new Error(stderr || stdout || err.message));
           } else {
