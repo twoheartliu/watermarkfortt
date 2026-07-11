@@ -13,6 +13,8 @@ import Slider from '@/components/ui/Slider.vue'
 import Separator from '@/components/ui/Separator.vue'
 import WatermarkTextSelect from '@/components/WatermarkTextSelect.vue'
 
+const API_BASE = import.meta.env.VITE_API_BASE || ''
+
 const STORAGE_KEY = 'watermark-options'
 const watermarkTextPresets = ['踢踢专用', '写稿大王踢踢', '严禁复制', '心心写稿']
 
@@ -130,7 +132,7 @@ const handleAddWatermark = async () => {
       if (isDocx) {
         const formData = new FormData()
         formData.append('file', selectedFile.value)
-        const res = await fetch('/api/convert', { method: 'POST', body: formData })
+        const res = await fetch(`${API_BASE}/api/convert`, { method: 'POST', body: formData })
         if (!res.ok) {
           const err = await res.json().catch(() => ({ message: '文档转换失败' }))
           throw new Error(err.message || '文档转换失败')
